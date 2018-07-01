@@ -1,7 +1,7 @@
 import os
 
 import sys #for getting to the AIY folder
-sys.path.insert(0, '~/AIY-projects-python')
+sys.path.insert(0, '~/AIY-projects-python/src/aiy')
 
 import aiy.audio
 import aiy.cloudspeed
