@@ -1,5 +1,8 @@
 import os
 
+import sys #for getting to the AIY folder
+sys.path.insert(0, '~/AIY-projects-python')
+
 import aiy.audio
 import aiy.cloudspeed
 import aiy.voicehat
