@@ -1,7 +1,10 @@
 import os
 
 import sys #for getting to the AIY folder
-sys.path.insert(0, '/AIY-projects-python')
+print(sys.path)
+sys.path.append(os.path.realpath('/AIY-projects-python'))
+sys.path.append('/home/pi/AIY-projects-python')
+print(sys.path)
 
 import aiy.audio
 import aiy.cloudspeech
