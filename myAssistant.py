@@ -36,7 +36,7 @@ from time import sleep
 # better voice than the default one
 import WavenetVoice
 
-voice = WavenetVoice()
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,16 +46,19 @@ logging.basicConfig(
 
 # custom local commands
 def power_off_pi():
+    voice = WavenetVoice()
     voice.say('Good bye!')
     subprocess.call('sudo shutdown now', shell=True)
 
 
 def reboot_pi():
+    voice = WavenetVoice()
     voice.say('See you in a bit!')
     subprocess.call('sudo reboot', shell=True)
 
 
 def say_ip():
+    voice = WavenetVoice()
     ip_address = subprocess.check_output("hostname -I | cut -d' ' -f1", shell=True)
     voice.say('My IP address is %s' % ip_address.decode('utf-8'))
 
@@ -79,6 +82,7 @@ def blink():
 
 
 def end_program():
+    voice = WavenetVoice()
     voice.say('ending program. goodbye')
     led = aiy.voicehat.get_led()
     led.set_state(aiy.voicehat.LED.OFF)
@@ -144,5 +148,5 @@ def main():
 
 
 if __name__ == '__main__':
-    server = subprocess.Popen('WebhookServer.py', shell=True)
+    #server = subprocess.Popen('WebhookServer.py', shell=True)
     main()
