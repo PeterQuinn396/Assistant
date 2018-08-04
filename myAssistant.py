@@ -33,30 +33,74 @@ import aiy.voicehat
 from google.assistant.library.event import EventType
 from time import sleep
 
+# better voice than the default one
+import WavenetVoice
+
+voice = WavenetVoice()
+
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
 )
 
 
+# custom local commands
 def power_off_pi():
-    aiy.audio.say('Good bye!')
+    voice.say('Good bye!')
     subprocess.call('sudo shutdown now', shell=True)
 
 
 def reboot_pi():
-    aiy.audio.say('See you in a bit!')
+    voice.say('See you in a bit!')
     subprocess.call('sudo reboot', shell=True)
 
 
 def say_ip():
     ip_address = subprocess.check_output("hostname -I | cut -d' ' -f1", shell=True)
-    aiy.audio.say('My IP address is %s' % ip_address.decode('utf-8'))
+    voice.say('My IP address is %s' % ip_address.decode('utf-8'))
 
- 
 
+def light_on():
+    led = aiy.voicehat.get_led()
+    led.set_state(aiy.voicehat.LED.ON)
+    sleep(5)
+
+
+def light_off():
+    led = aiy.voicehat.get_led()
+    led.set_state(aiy.voicehat.LED.OFF)
+    sleep(5)
+
+
+def blink():
+    led = aiy.voicehat.get_led()
+    led.set_state(aiy.voicehat.LED.BLINK)
+    sleep(5)
+
+
+def end_program():
+    voice.say('ending program. goodbye')
+    led = aiy.voicehat.get_led()
+    led.set_state(aiy.voicehat.LED.OFF)
+    exit(0)
+
+
+# this is the LUT for the phrases and local commands associated with them
+local_cmds_dict = {
+    'power off': power_off_pi,
+    'reboot': reboot_pi,
+    'ip address': say_ip,
+    'light on': light_on,
+    'light off': light_off,
+    'blink': blink,
+    'end program': end_program
+}
+
+
+# this function is what actually runs our assistant
 def process_event(assistant, event):
     status_ui = aiy.voicehat.get_status_ui()
+
     if event.type == EventType.ON_START_FINISHED:
         status_ui.status('ready')
         if sys.stdout.isatty():
@@ -68,48 +112,13 @@ def process_event(assistant, event):
     elif event.type == EventType.ON_RECOGNIZING_SPEECH_FINISHED and event.args:
         print('You said:', event.args['text'])
         text = event.args['text'].lower()
-        if text == 'power off':
+
+        local_cmd = local_cmds_dict.get(text, 0)
+
+        if local_cmd != 0:
             assistant.stop_conversation()
-            power_off_pi()
-        elif text == 'reboot':
-            assistant.stop_conversation()
-            reboot_pi()
-        elif text == 'ip address':
-            assistant.stop_conversation()
-            say_ip()
-        elif text == 'light on':
-            assistant.stop_conversation()
-            led = aiy.voicehat.get_led()
-            led.set_state(aiy.voicehat.LED.ON)
-            sleep(5)
-        elif text == 'light off':
-            assistant.stop_conversation()
-            led = aiy.voicehat.get_led()
-            led.set_state(aiy.voicehat.LED.OFF)
-            sleep(5)
-        elif text == 'blink':
-            assistant.stop_conversation()
-            led = aiy.voicehat.get_led()
-            led.set_state(aiy.voicehat.LED.BLINK)
-            sleep(5)
-        elif text == 'beat':
-            assistant.stop_conversation()
-            led = aiy.voicehat.get_led()
-            led.set_state(aiy.voicehat.LED.PULSE_QUICK)
-            sleep(5)
-        elif text == 'beacon':
-            assistant.stop_conversation()
-            led = aiy.voicehat.get_led()
-            led.set_state(aiy.voicehat.LED.BEACON)
-            sleep(5)
-        elif text == 'end program':
-            assistant.say('ending program. goodbye')
-            #aiy.audio.say('ending program. goodbye')
-            led = aiy.voicehat.get_led()
-            led.set_state(aiy.voicehat.LED.OFF)
-            exit(0)
-        
-            
+            local_cmd()
+
 
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         status_ui.status('thinking')
@@ -128,8 +137,6 @@ def main():
         print('Cannot run hotword demo on Pi Zero!')
         exit(-1)
 
-    
-    
     credentials = aiy.assistant.auth_helpers.get_assistant_credentials()
     with Assistant(credentials) as assistant:
         for event in assistant.start():
@@ -137,4 +144,5 @@ def main():
 
 
 if __name__ == '__main__':
+    server = subprocess.Popen('WebhookServer.py', shell=True)
     main()
