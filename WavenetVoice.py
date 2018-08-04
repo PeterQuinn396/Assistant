@@ -16,6 +16,7 @@ from google.cloud import texttospeech
 import os
 import sys
 
+
 class WavenetVoice:
 
     def __init__(self, voice_name='en-US-wavenet-c', language_code='en-US'):
@@ -52,7 +53,8 @@ class WavenetVoice:
         self._synthesize_text(text)
         playsound("output.mp3")
         try:
-            os.remove("output.mp3")
+            #os.remove("output.mp3")
+            pass
         except OSError:
             pass
 
@@ -63,6 +65,24 @@ class WavenetVoice:
     def play_sound_file(self, filename):  # plays a sound file
         playsound(filename)
 
+    def create_wave(self, text): 
+        client = texttospeech.TextToSpeechClient()
+
+        input_text = texttospeech.types.SynthesisInput(text=text)
+
+        # Google API notes
+        # Note: the voice can also be specified by name.
+        # Names of voices can be retrieved with client.list_voices().
+        voice = texttospeech.types.VoiceSelectionParams(language_code=self.language_code, name=self.voice_name)
+
+        audio_config = texttospeech.types.AudioConfig(
+            audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16)
+
+        response = client.synthesize_speech(input_text, voice, audio_config)
+        
+        with open('wavefile.wav', 'wb') as out:
+            out.write(response.audio_content)
+              
 
 if __name__ == '__main__': # This code can say a string passed to it on the command line when run
 

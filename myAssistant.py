@@ -34,7 +34,7 @@ from google.assistant.library.event import EventType
 from time import sleep
 
 # better voice than the default one
-import WavenetVoice
+from WavenetVoice import WavenetVoice
 
 
 
@@ -46,21 +46,28 @@ logging.basicConfig(
 
 # custom local commands
 def power_off_pi():
+        
     voice = WavenetVoice()
-    voice.say('Good bye!')
+    voice.create_wave('Good Bye')
+    aiy.audio.play_wave('wavefile.wav')
     subprocess.call('sudo shutdown now', shell=True)
 
 
 def reboot_pi():
+      
     voice = WavenetVoice()
-    voice.say('See you in a bit!')
+    voice.create_wave('See you in a bit!')
+    aiy.audio.play_wave('wavefile.wav')
     subprocess.call('sudo reboot', shell=True)
 
 
 def say_ip():
-    voice = WavenetVoice()
+    
     ip_address = subprocess.check_output("hostname -I | cut -d' ' -f1", shell=True)
-    voice.say('My IP address is %s' % ip_address.decode('utf-8'))
+      
+    voice = WavenetVoice()
+    voice.create_wave('My IP address is %s' % ip_address.decode('utf-8'))
+    aiy.audio.play_wave('wavefile.wav')
 
 
 def light_on():
@@ -83,7 +90,8 @@ def blink():
 
 def end_program():
     voice = WavenetVoice()
-    voice.say('ending program. goodbye')
+    voice.create_wave('ending program')
+    aiy.audio.play_wave('wavefile.wav')
     led = aiy.voicehat.get_led()
     led.set_state(aiy.voicehat.LED.OFF)
     exit(0)
@@ -149,4 +157,7 @@ def main():
 
 if __name__ == '__main__':
     #server = subprocess.Popen('WebhookServer.py', shell=True)
+        
+    
+    #main
     main()
