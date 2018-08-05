@@ -100,14 +100,13 @@ local_cmds_dict = {
     'light off': light_off,
     'blink': blink,
     'end program': end_program,
-
 }
 
 
 # this function is what actually runs our assistant
-def process_event(assistant, event):
+def process_event(assistant, event, dark_mode):
     status_ui = aiy.voicehat.get_status_ui()
-    dark_mode = False
+
 
     if event.type == EventType.ON_START_FINISHED:
 
@@ -127,6 +126,11 @@ def process_event(assistant, event):
         if text == 'run dark' or text == 'dark mode':
             assistant.stop_conversation()
             dark_mode = True
+            return dark_mode
+        elif text == 'lights on':
+            assistant.stop_conversation()
+            dark_mode = False
+            return dark_mode
         elif local_cmd != 0:
             assistant.stop_conversation()
             local_cmd()
@@ -154,8 +158,10 @@ def main():
 
     credentials = aiy.assistant.auth_helpers.get_assistant_credentials()
     with Assistant(credentials) as assistant:
+        dark_mode = False
+
         for event in assistant.start():
-            process_event(assistant, event)
+            dark_mode = process_event(assistant, event, dark_mode)
 
 
 if __name__ == '__main__':
