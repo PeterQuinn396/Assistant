@@ -146,6 +146,7 @@ def process_event(assistant, event, dark_mode):
             status_ui.status('power-off')
         else:
             status_ui.status('ready')
+        return dark_mode
 
     elif event.type == EventType.ON_ASSISTANT_ERROR and event.args and event.args['is_fatal']:
         sys.exit(1)
@@ -157,10 +158,10 @@ def main():
         exit(-1)
 
     credentials = aiy.assistant.auth_helpers.get_assistant_credentials()
+    dark_mode = False
+    subprocess.call('export GOOGLE_APPLICATION_CREDENTIALS="/home/pi/Desktop/Assistant-fe54628ef7ab.json"', shell=True)
     with Assistant(credentials) as assistant:
-        dark_mode = False
-
-        for event in assistant.start():
+       for event in assistant.start():
             dark_mode = process_event(assistant, event, dark_mode)
 
 
