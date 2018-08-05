@@ -36,8 +36,6 @@ from time import sleep
 # better voice than the default one
 from WavenetVoice import WavenetVoice
 
-
-
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
@@ -46,7 +44,6 @@ logging.basicConfig(
 
 # custom local commands
 def power_off_pi():
-        
     voice = WavenetVoice()
     voice.create_wave('Good Bye')
     aiy.audio.play_wave('wavefile.wav')
@@ -54,7 +51,6 @@ def power_off_pi():
 
 
 def reboot_pi():
-      
     voice = WavenetVoice()
     voice.create_wave('See you in a bit!')
     aiy.audio.play_wave('wavefile.wav')
@@ -62,9 +58,7 @@ def reboot_pi():
 
 
 def say_ip():
-    
     ip_address = subprocess.check_output("hostname -I | cut -d' ' -f1", shell=True)
-      
     voice = WavenetVoice()
     voice.create_wave('My IP address is %s' % ip_address.decode('utf-8'))
     aiy.audio.play_wave('wavefile.wav')
@@ -105,15 +99,18 @@ local_cmds_dict = {
     'light on': light_on,
     'light off': light_off,
     'blink': blink,
-    'end program': end_program
+    'end program': end_program,
+
 }
 
 
 # this function is what actually runs our assistant
 def process_event(assistant, event):
     status_ui = aiy.voicehat.get_status_ui()
+    dark_mode = False
 
     if event.type == EventType.ON_START_FINISHED:
+
         status_ui.status('ready')
         if sys.stdout.isatty():
             print('Say "OK, Google" then speak, or press Ctrl+C to quit...')
@@ -127,7 +124,10 @@ def process_event(assistant, event):
 
         local_cmd = local_cmds_dict.get(text, 0)
 
-        if local_cmd != 0:
+        if text == 'run dark' or text == 'dark mode':
+            assistant.stop_conversation()
+            dark_mode = True
+        elif local_cmd != 0:
             assistant.stop_conversation()
             local_cmd()
 
@@ -138,7 +138,10 @@ def process_event(assistant, event):
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
           or event.type == EventType.ON_CONVERSATION_TURN_TIMEOUT
           or event.type == EventType.ON_NO_RESPONSE):
-        status_ui.status('ready')
+        if dark_mode:
+            status_ui.status('power-off')
+        else:
+            status_ui.status('ready')
 
     elif event.type == EventType.ON_ASSISTANT_ERROR and event.args and event.args['is_fatal']:
         sys.exit(1)
@@ -156,8 +159,5 @@ def main():
 
 
 if __name__ == '__main__':
-    #server = subprocess.Popen('WebhookServer.py', shell=True)
-        
-    
-    #main
+    # server = subprocess.Popen('WebhookServer.py', shell=True)
     main()
