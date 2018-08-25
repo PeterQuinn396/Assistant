@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-
+import time
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
@@ -16,6 +16,7 @@ while(True):
 
     # Display the resulting frame
     cv2.imshow('frame',gray)
+    time.sleep(.1)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
