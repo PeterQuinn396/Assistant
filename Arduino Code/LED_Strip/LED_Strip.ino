@@ -38,8 +38,8 @@ byte brightness = 127;
 //animation memory
 byte counter = 0; //counter used in animations
 byte blinkCnt = 40; //number of cycles*DELAY for a full on/off cycle for blink
-byte moveCnt = 20; //number of cycles*DELAY to move pixels along
-
+byte moveCnt = 2; //number of cycles*DELAY to move pixels along
+bool fadeInc = true;
 void setup() {
 
   FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, NUM_LEDS);
@@ -56,7 +56,7 @@ void setup() {
 
 void loop() {
 
- //grab new commands if something was sent over serial
+  //grab new commands if something was sent over serial
   if (Serial.available() > 0) {
     // read the incoming byte:
 
@@ -110,6 +110,27 @@ void loop() {
         case 'd': //random colours
 
           break;
+
+      //animation modes
+        case 'l':
+          FastLED.setBrightness(brightness);
+          mode = 'l';
+          counter = 0;
+          break;
+
+        case 'm':
+          FastLED.setBrightness(brightness);
+          mode = 'm';
+          counter = 0;
+          break;
+
+        case 'f':
+          FastLED.setBrightness(brightness);
+          mode ='f';
+          counter = 0;
+          bool fadeInc = true;
+          break;
+        
       }
     }
   }
@@ -135,10 +156,12 @@ void loop() {
     case 'm': //colour moves and wraps
 
       if (counter == 0) {
-        CRGB last; //save the last leds colour
+        CRGB last = leds[0]; //save the last leds colour
+        CRGB temp;
         for (byte i = 1; i < NUM_LEDS; i++) {
-          last = leds[i];
-          leds[i] = leds[i - 1];
+          temp = leds[i];
+          leds[i] = last;
+          last = temp;
         }
         leds[0] = last; //place last led colour in first position
         FastLED.show();
@@ -150,6 +173,23 @@ void loop() {
       break;
 
     case 'f': //colour fades in and out / pulses
+      FastLED.setBrightness(counter);
+      FastLED.show();
+      FastLED.delay(DELAY);
+
+      if (fadeInc){ //increase brightness if we are below max brightness
+       counter++;
+      } else{
+        counter--;
+      }
+
+      if (counter <= 4){ //min brightness value
+        fadeInc = true;
+      }
+      if (counter >= brightness){
+        fadeInc=false;
+      }
+     
       break;
 
     case 's': //color moves like a sin wave

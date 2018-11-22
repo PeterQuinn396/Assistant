@@ -6,9 +6,24 @@ from os import name
 
 class LEDController:
 
+
+
     def __init__(self):
         self.port = ""
         self.brightness =5 #set default brightness
+
+        dict = { # to be finished
+            'z': self.set_off,
+            'r': self.set_red,
+            'w': self.set_white,
+            'q': self.set_rainbow,
+            'd': self.set_random,
+            'x': self.set_solid,
+            'l': self.set_blink,
+            'm': self.set_move,
+
+
+        }
 
         if name == 'nt': #windows
             self.port = 'COM1'
@@ -17,6 +32,8 @@ class LEDController:
             # use lsdev on pi to look up devices
         else:
             print("Unrecognized OS")
+
+
 
     def led_error(self): # have strip blink red to indicate error
         with serial.Serial(port=self.port)as ser:
@@ -93,4 +110,15 @@ class LEDController:
         if self.brightness<1:
             self.brightness=1
         self.set_brightness(self.brightness)
+
+
+if __name__ == '__main__':
+    cont = LEDController()
+    while True:
+        print(cont.dict)
+        x = input("Input a char: \n")
+        func = cont.dict.get(x, None)
+
+        if func is not None:
+            func()
 
