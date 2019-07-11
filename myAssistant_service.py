@@ -38,6 +38,9 @@ from time import sleep
 # better voice than the default one
 from WavenetVoice import WavenetVoice
 
+
+
+""" Needs to be modified to use the google assisant service, as the google assisant library is now deprecated"""
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s:%(name)s:%(message)s"

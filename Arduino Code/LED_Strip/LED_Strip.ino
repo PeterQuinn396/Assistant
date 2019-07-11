@@ -31,7 +31,7 @@
 #define DELAY 20
 
 CRGB leds[NUM_LEDS];
-char mode = 'z'; //default, strip off
+char mode = 'x'; //default, strip off
 char incByte;
 byte brightness = 127;
 
@@ -51,6 +51,10 @@ void setup() {
   FastLED.delay(DELAY);
 
   Serial.begin(9600);
+
+  fill_rainbow(leds, NUM_LEDS, 0, 255 / NUM_LEDS);
+  FastLED.show();
+  FastLED.delay(DELAY);
 
 }
 
@@ -80,12 +84,8 @@ void loop() {
           FastLED.show();
           FastLED.delay(DELAY);
           break;
-
-        case 'x': //set mode to x for no animation
-          mode = 'x';
-          break;
-
-        case 'c': //fill in an RGB specified colour
+      
+      case 'c': //fill in an RGB specified colour
           fill_solid(leds, NUM_LEDS, CRGB(Serial.read(), Serial.read(), Serial.read()));
           break;
 
@@ -112,20 +112,35 @@ void loop() {
           break;
 
       //animation modes
+      
+        case 'x': //set mode to x for no animation
+          mode = 'x';
+          FastLED.setBrightness(brightness);
+          FastLED.show();
+          FastLED.delay(DELAY);
+          break;
+
+          
         case 'l':
           FastLED.setBrightness(brightness);
+          FastLED.show();
+          FastLED.delay(DELAY);
           mode = 'l';
           counter = 0;
           break;
 
         case 'm':
           FastLED.setBrightness(brightness);
+          FastLED.show();
+          FastLED.delay(DELAY);
           mode = 'm';
           counter = 0;
           break;
 
         case 'f':
           FastLED.setBrightness(brightness);
+          FastLED.show();
+          FastLED.delay(DELAY);
           mode ='f';
           counter = 0;
           bool fadeInc = true;

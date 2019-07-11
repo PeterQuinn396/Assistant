@@ -6,11 +6,9 @@ from os import name
 
 class LEDController:
 
-
-
     def __init__(self):
         self.port = ""
-        self.brightness =5 #set default brightness
+        self.brightness = 5 #set default brightness
 
         dict = { # to be finished
             'z': self.set_off,
@@ -20,9 +18,7 @@ class LEDController:
             'd': self.set_random,
             'x': self.set_solid,
             'l': self.set_blink,
-            'm': self.set_move,
-
-
+            'm': self.set_move
         }
 
         if name == 'nt': #windows
@@ -32,7 +28,6 @@ class LEDController:
             # use lsdev on pi to look up devices
         else:
             print("Unrecognized OS")
-
 
 
     def led_error(self): # have strip blink red to indicate error
